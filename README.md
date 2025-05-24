@@ -87,3 +87,20 @@
 - [ ] admin dashboard to manage the products
 - [ ] sort and pagination
 - [ ] deploy
+
+## Tech Stack
+
+- [x] Runtime: Bun.
+- [x] Frontend: React with React Router v7 Framework.
+- [x] Styling: Tailwind CSS with shadcn/ui.
+- [x] Schema Validation: Zod.
+- [x] Backend Framework: Hono.
+- [x] API Layer: tRPC.
+- [x] ORM: Prisma.
+- [x] Database: PostgreSQL.
+- [x] Containerization: Docker and Docker Compose. At least for local database setup.
+- [x] Tools: Biome or ESLint with Prettier.
+- (Optional) Auth: Better Auth.
+- (Optional) Monorepo Tool: Turborepo.
+- Deployment: Deploy on any platform such as Vercel, Netlify, Railway, Render, Neon, Supabase, Coolify, VPS, GCP, AWS, or anywhere is fine.
+- Domain: Connect to a subdomain/domain you own.
