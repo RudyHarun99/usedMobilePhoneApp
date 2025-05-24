@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" id="globe">
+  <g>
+    <g id="_Слой_1">
+      <g>
+        <line x1="390.176" x2="1599.384" y1="1000" y2="1000" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:30px"></line>
+        <circle cx="1005.22" cy="1000" r="604.604" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:30px"></circle>
+        <ellipse cx="1005.22" cy="1000" rx="252.482" ry="604.604" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:30px"></ellipse>
+        <path d="M1471.7616 1386.2664c-110.8933-56.1133-278.7156-91.8801-466.5419-91.8801-187.2726 0-354.6586 35.5561-465.5594 91.3843M1471.7616 613.7336c-110.8933 56.1136-278.7156 91.8801-466.5419 91.8801-187.2728 0-354.6589-35.5561-465.5597-91.3843" style="fill:none;stroke:#000;stroke-miterlimit:10;stroke-width:30px"></path>
+      </g>
+    </g>
+  </g>
+</svg>
