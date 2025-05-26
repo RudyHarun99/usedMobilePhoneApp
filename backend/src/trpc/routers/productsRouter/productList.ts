@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import { publicProcedure } from '../../index'
 
+// Define sorting order schema
 const sortOrderSchema = z.enum([
   'asc', 'desc'
 ]).optional().default('asc')
 
+// Procedure to list products with optional filters
 export const listProduct = publicProcedure
   .input(z.object({
     search: z.string().optional(),
@@ -33,11 +35,13 @@ export const listProduct = publicProcedure
         offset
       } = input
 
+      // Define search options
       const option = {
         contains: search,
         mode: 'insensitive' as const
       }
 
+      // Build query filters
       const where = {
         AND: [
           search ? {
@@ -55,6 +59,7 @@ export const listProduct = publicProcedure
         ].filter(condition => Object.keys(condition).length > 0)
       }
 
+      // Execute query with Prisma
       const [products, total] = await Promise.all([
         ctx.prisma.product.findMany({
           where,

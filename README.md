@@ -53,45 +53,10 @@
 - Ensure environment variables are set correctly in the .env file.
 
 ## Check List
-### Backend
-- [x] setup prisma database
-- [x] schema and seed database
-- [x] setup docker compose for database
-- [x] setup hono and trpc
-- [x] get all phones
-- [x] search, filter, sort, limit, offset phones
-- [x] get phone by id
-- [x] create new phone
-- [x] update phone
-- [x] delete phone
-- [x] validation using zod
-- [x] error handler
-- [ ] user database
-- [ ] login and register
-- [ ] implement basic authentication and authorization
-- [ ] deployment
 
-### Frontend
-- [x] react router v7 framework setup
-- [x] trpc client setup
-- [x] fetch from backend using useQuery
-- [x] search and filter features
-- [x] router for home page and detail page
-- [x] navbar component
-- [x] searchbar component
-- [x] left filterbar component
-- [x] product card component
-- [x] product detail component
-- [ ] mobile friendly
-- [ ] login and register
-- [ ] admin dashboard to manage the products
-- [ ] sort and pagination
-- [ ] deploy
-
-## Tech Stack
-
-- [x] Runtime: Bun.
-- [x] Frontend: React with React Router v7 Framework.
+### Tech Stack
+- [x] Runtime & Package Manager: Bun.
+- [x] Frontend: React with React Router v7 Framework. Following the latest convention and practice.
 - [x] Styling: Tailwind CSS with shadcn/ui.
 - [x] Schema Validation: Zod.
 - [x] Backend Framework: Hono.
@@ -100,7 +65,26 @@
 - [x] Database: PostgreSQL.
 - [x] Containerization: Docker and Docker Compose. At least for local database setup.
 - [x] Tools: Biome or ESLint with Prettier.
-- (Optional) Auth: Better Auth.
-- (Optional) Monorepo Tool: Turborepo.
-- Deployment: Deploy on any platform such as Vercel, Netlify, Railway, Render, Neon, Supabase, Coolify, VPS, GCP, AWS, or anywhere is fine.
-- Domain: Connect to a subdomain/domain you own.
+- [ ] Deployment: Deploy on any platform such as Vercel, Netlify, Railway, Render, Neon, Supabase, Coolify, VPS, GCP, AWS, or anywhere is fine.
+- [ ] Domain: Connect to a subdomain/domain you own.
+- [ ] (Optional) Auth: Better Auth.
+- [ ] (Optional) Monorepo Tool: Turborepo.
+
+### Features and Deliverables
+- [x] Provide a public GitHub repository with:
+   - [x] Clear instructions on the README how to set up and run the project locally.
+   - [x] The database schema and any necessary seed scripts.
+   - [ ] Comments in the code to explain key parts of the implementation.
+   - [ ] (Optional) A short write-up in the README explaining decisions made during the development process, including challenges you encountered and how they were resolved.
+- [x] Display a list of all realistic products, the used mobile phones, on a homepage with a CSS grid showing name, price, thumbnail image, and more.
+- [x] Allow users to select a product to view its details on a separate page with name, description, price, larger image, and more.
+- [x] Ensure code quality through consistent linting/formatting, modular folder structure, and comments for complex logic.
+- [x] (Optional) Search products by keyword.
+- [x] (Optional) Have sorting, filtering, and pagination with various criteria.
+- [ ] Deploy the application with a live URL and a public GitHub repository including documentation.
+- [ ] (Optional) Product category.
+- [ ] (Optional) Product variant.
+- [ ] (Optional) Implement basic authentication & authorization.
+- [ ] (Optional) Add to cart and check out flow of buying the product.
+- [ ] (Optional) Admin dashboard to manage the products, monitoring the transactions, etc.
+- [ ] (Optional) Payment gateway integration. Sandbox is okay.

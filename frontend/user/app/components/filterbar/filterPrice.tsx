@@ -1,5 +1,7 @@
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
+import { useOutletContext } from 'react-router';
+import type { OptionProps } from "~/types";
 
 const style = {
   filterGroupTitle: "items-center flex text-[#222] font-bold justify-between leading-[22px] mb-3",
@@ -9,18 +11,35 @@ const style = {
 };
 
 type FilterPriceProps = {
-  minPrice: number;
-  maxPrice: number;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleClick: () => void;
+  option: OptionProps;
+  setOption: React.Dispatch<React.SetStateAction<OptionProps>>;
+  inputMinPrice: number;
+  setInputMinPrice: React.Dispatch<React.SetStateAction<number>>;
+  inputMaxPrice: number;
+  setInputMaxPrice: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function FilterPrice({
-  minPrice,
-  maxPrice,
-  handleChange,
-  handleClick
-}: FilterPriceProps) {
+export default function FilterPrice() {
+  const {
+    option, setOption,
+    inputMinPrice, setInputMinPrice,
+    inputMaxPrice, setInputMaxPrice
+  } = useOutletContext() as FilterPriceProps;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'minPrice') setInputMinPrice(Number(value));
+    if (name === 'maxPrice') setInputMaxPrice(Number(value));
+  }
+
+  const handleClick = () => {
+    setOption({
+      ...option,
+      minPrice: inputMinPrice,
+      maxPrice: inputMaxPrice,
+    });
+  };
+
   return (
     <div className='mb-5'>
       <div className={style.filterGroupTitle}>
@@ -31,7 +50,7 @@ export default function FilterPrice({
           className={style.inputPriceMin}
           placeholder='Min'
           name='minPrice'
-          value={minPrice}
+          value={inputMinPrice}
           onChange={handleChange}
         />
         -
@@ -39,7 +58,7 @@ export default function FilterPrice({
           className={style.inputPriceMax}
           placeholder='Max'
           name='maxPrice'
-          value={maxPrice}
+          value={inputMaxPrice}
           onChange={handleChange}
         />
         <Button

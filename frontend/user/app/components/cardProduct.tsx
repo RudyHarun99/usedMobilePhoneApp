@@ -9,7 +9,7 @@ const style = {
   productPrice: "text-[28px] font-bold leading-[38px] overflow-hidden text-ellipsis break-all mb-1",
 };
 
-interface ProductProps {
+type Products = {
   id: string | number;
   imageUrl?: string;
   description: string;
@@ -17,11 +17,13 @@ interface ProductProps {
   minimumOrderQuantity: number | string;
 }
 
+type ProductProps = {
+  product: Products
+}
+
 export default function CardProduct({
   product
-}: {
-  product: ProductProps
-}) {
+}: ProductProps) {
   const {
     id,
     imageUrl,
@@ -33,7 +35,7 @@ export default function CardProduct({
   return (
     <Link to={`/${id}`}>
       <div className={style.productCardContainer}>
-        <div className='relative mb-3 w-48 h-48'>
+        <div className='relative w-48 h-48 mb-3'>
           <img
             src={imageUrl || defaultImage}
             alt='product'

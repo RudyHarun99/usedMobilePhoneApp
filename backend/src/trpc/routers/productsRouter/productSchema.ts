@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+// Schema for product data validation
 export const productSchema = z.object({
   sku: z.string(),
   slug: z.string(),

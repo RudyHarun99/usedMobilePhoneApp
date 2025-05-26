@@ -1,6 +1,9 @@
 import type { Route } from './+types/productDetail';
 import { trpc } from '~/lib/trpc';
 import CardDetail from '~/components/cardDetail';
+import LoadingFetch from "~/components/loadingFetch";
+import ErrorFetch from "~/components/errorFetch";
+import NotFound from '~/components/notFound';
 
 export default function ProductDetail({
   params
@@ -12,12 +15,12 @@ export default function ProductDetail({
     error,
   } = trpc.products.getById.useQuery(productId);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading products: {error.message}</div>;
-  if (!product) return <div>Product not found.</div>;
+  if (isLoading) return <LoadingFetch />;
+  if (error) return <ErrorFetch message={error.message} />;
+  if (!product) return <NotFound />;
 
   return (
-    <div className="overflow-hidden relative my-5 mx-15 pt-5">
+    <div className="relative pt-5 my-5 overflow-hidden mx-15">
       <CardDetail product={product} />
     </div>
   );

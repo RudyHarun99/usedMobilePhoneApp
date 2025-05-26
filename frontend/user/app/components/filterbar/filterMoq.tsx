@@ -1,5 +1,7 @@
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
+import { useOutletContext } from 'react-router';
+import type { OptionProps } from "~/types";
 
 const style = {
   filterGroupTitle: "items-center flex text-[#222] font-bold justify-between leading-[22px] mb-3",
@@ -8,16 +10,30 @@ const style = {
 };
 
 type FilterMoqProps = {
-  minOrder: number;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleClick: () => void;
+  option: OptionProps;
+  setOption: React.Dispatch<React.SetStateAction<OptionProps>>;
+  inputMinOrder: number;
+  setInputMinOrder: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function FilterMoq({
-  minOrder,
-  handleChange,
-  handleClick
-}: FilterMoqProps) {
+export default function FilterMoq() {
+  const {
+    option, setOption,
+    inputMinOrder, setInputMinOrder,
+  } = useOutletContext() as FilterMoqProps;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setInputMinOrder(Number(value));
+  };
+
+  const handleClick = () => {
+    setOption({
+      ...option,
+      minimumOrderQuantity: inputMinOrder,
+    });
+  };
+
   return (
     <div className='mb-5'>
       <div className={style.filterGroupTitle}>
@@ -27,7 +43,7 @@ export default function FilterMoq({
         <Input
           className={style.inputMoq}
           name='minOrder'
-          value={minOrder}
+          value={inputMinOrder}
           onChange={handleChange}
         />
         <Button

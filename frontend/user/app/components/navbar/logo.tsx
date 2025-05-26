@@ -1,6 +1,6 @@
 import { style } from "./style";
-import Image from "../ui/image";
 import LogoImage from "~/assets/alibaba-logo.png";
+import Image from "../ui/image";
 
 export default function Logo() {
   return (

@@ -25,11 +25,13 @@ const TRPC_ERROR_CODE_HTTP_STATUS = {
   GATEWAY_TIMEOUT: 504,
 } as const
 
+// Define the structure of an error response
 type ErrorResponse = {
   error: {
     code?: string
     timestamp: string
     type: string
+    message?: string
     path?: string
     data?: unknown
     details?: unknown
@@ -38,6 +40,7 @@ type ErrorResponse = {
   }
 }
 
+// Error handling middleware function
 export const errorHandler = (err: unknown, c: Context) => {
   const timestamp = new Date().toISOString()
 
@@ -51,6 +54,7 @@ export const errorHandler = (err: unknown, c: Context) => {
         code: err.code,
         timestamp,
         type: 'TRPC_ERROR',
+        message: err.message,
         data: err.cause
       }
     }
@@ -64,6 +68,7 @@ export const errorHandler = (err: unknown, c: Context) => {
         code: 'VALIDATION_ERROR',
         timestamp,
         type: 'ZOD_ERROR',
+        message: 'Validation failed',
         details: err.issues,
         path: err.issues[0]?.path.join('.')
       }
@@ -78,6 +83,7 @@ export const errorHandler = (err: unknown, c: Context) => {
         code: `PRISMA_${err.code}`,
         timestamp,
         type: 'PRISMA_ERROR',
+        message: 'Database request error'
       }
     }
     return c.json(response, 400)
@@ -87,8 +93,10 @@ export const errorHandler = (err: unknown, c: Context) => {
   const response: ErrorResponse = {
     error: {
       timestamp,
-      type: 'UNKNOWN_ERROR'
+      type: 'UNKNOWN_ERROR',
+      message: 'An unknown error occurred'
     }
   }
+  // Return a generic error response
   return c.json(response, 500)
 }

@@ -2,6 +2,7 @@ import type { Route } from "./+types/home";
 import { Outlet } from "react-router";
 import { Navbar } from "~/components/navbar";
 import { useState } from "react";
+import type { OptionProps } from "~/types";
 
 export function meta(_args: Route.MetaArgs) {
   return [
@@ -11,11 +12,16 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function Home() {
-  const [ option, setOption ] = useState({
+  const [ inputSearch, setInputSearch ] = useState('');
+  const [ inputMinPrice, setInputMinPrice ] = useState(0);
+  const [ inputMaxPrice, setInputMaxPrice ] = useState(0);
+  const [ inputMinOrder, setInputMinOrder ] = useState(0);
+
+  const [ option, setOption ] = useState<OptionProps>({
     search: '',
     minPrice: 0,
     maxPrice: 0,
-    minimumOrderQuantity: 0
+    minimumOrderQuantity: 0,
   });
 
   return (
@@ -23,8 +29,20 @@ export default function Home() {
       <Navbar
         option={option}
         setOption={setOption}
+        inputSearch={inputSearch}
+        setInputSearch={setInputSearch}
+        setInputMinPrice={setInputMinPrice}
+        setInputMaxPrice={setInputMaxPrice}
+        setInputMinOrder={setInputMinOrder}
       />
-      <Outlet context={{ option, setOption }} />
+      <Outlet
+        context={{
+          option, setOption,
+          inputMinPrice, setInputMinPrice,
+          inputMaxPrice, setInputMaxPrice,
+          inputMinOrder, setInputMinOrder
+        }}
+      />
     </>
   );
 };
