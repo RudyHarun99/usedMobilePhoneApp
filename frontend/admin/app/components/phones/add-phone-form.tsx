@@ -4,6 +4,8 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { ErrorMessage } from "~/components/ErrorMessage";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +19,7 @@ import {
 interface AddPhoneFormProps {
   onSubmit: (data: ProductFormData) => void;
   isSubmitting?: boolean;
+  error?: string | null;
 }
 
 export interface ProductFormData {
@@ -30,7 +33,7 @@ export interface ProductFormData {
   minimumOrderQuantity: number;
 }
 
-export function AddPhoneForm({ onSubmit, isSubmitting = false }: AddPhoneFormProps) {
+export function AddPhoneForm({ onSubmit, isSubmitting = false, error = null }: AddPhoneFormProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<ProductFormData>({
     sku: "",
@@ -103,6 +106,15 @@ export function AddPhoneForm({ onSubmit, isSubmitting = false }: AddPhoneFormPro
             Fill in the details of the phone you want to add to the inventory.
           </DialogDescription>
         </DialogHeader>
+        {error && (
+          <div className="mb-4">
+            <ErrorMessage
+              message={error}
+              severity="error"
+              onDismiss={() => setOpen(false)}
+            />
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -193,7 +205,14 @@ export function AddPhoneForm({ onSubmit, isSubmitting = false }: AddPhoneFormPro
           </div>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Adding..." : "Add Phone"}
+              {isSubmitting ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Adding...
+                </>
+              ) : (
+                "Add Phone"
+              )}
             </Button>
           </DialogFooter>
         </form>

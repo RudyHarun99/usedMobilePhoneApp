@@ -14,13 +14,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./app"),
-      "@backend": path.resolve(__dirname, "../../backend/src"),
     },
-  },
-  optimizeDeps: {
-    exclude: [
-      "@react-router/node",
-      "@react-router/serve",
-    ],
   },
 });

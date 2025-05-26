@@ -10,3 +10,17 @@ export type OptionProps = {
   sortBy?: SortBy;
   sortOrder?: SortOrder;
 };
+
+export type ProductType = {
+  id: string | number;
+  sku: string;
+  slug: string;
+  name: string;
+  imageUrl?: string | null;
+  description: string;
+  price: number | string;
+  stockQuantity: number;
+  minimumOrderQuantity: number | string;
+  createdAt: string;
+  updatedAt: string;
+}

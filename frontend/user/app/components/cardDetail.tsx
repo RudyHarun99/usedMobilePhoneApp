@@ -1,4 +1,5 @@
 import defaultImage from '~/assets/defaultImage.png';
+import type { ProductType } from '~/types';
 
 const style = {
   mainContainer: "flex flex-row w-full mb-5 justify-center p-6 bg-white rounded-xl",
@@ -16,24 +17,10 @@ const style = {
   minQuantity: "text-[#181D27] text-base leading-[30px] font-bold",
 };
 
-interface ProductProps {
-  id: string | number;
-  sku: string;
-  slug: string;
-  name: string;
-  imageUrl?: string | null;
-  description: string;
-  price: number | string;
-  stockQuantity: number;
-  minimumOrderQuantity: number | string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export default function CardDetail({
   product
 }: {
-  product: ProductProps
+  product: ProductType
 }) {
   const {
     name,

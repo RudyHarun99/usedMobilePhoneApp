@@ -4,6 +4,8 @@ import { Button } from "~/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { AddPhoneForm, type ProductFormData } from "~/components/phones/add-phone-form";
 import { EditPhoneForm } from "~/components/phones/edit-phone-form";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { ErrorMessage } from "~/components/ErrorMessage";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +26,7 @@ import type { Route } from "./+types/phones";
 import { trpc } from "~/lib/trpc";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@backend/trpc/routers";
+import React from "react";
 
 export function meta(_args: Route["MetaArgs"]) {
   return [
@@ -49,11 +52,19 @@ interface Product {
 export default function PhonesPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProductId, setDeletingProductId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const utils = trpc.useUtils();
-  const { data, isLoading } = trpc.products.list.useQuery();
+  const productsQuery = trpc.products.list.useQuery();
   
+  React.useEffect(() => {
+    if (productsQuery.error) {
+      setError((productsQuery.error as TRPCClientErrorLike<AppRouter>)?.message || "Failed to load products");
+    }
+  }, [productsQuery.error]);
+
   const createProduct = trpc.products.create.useMutation({
     onSuccess: () => {
       utils.products.list.invalidate();
@@ -107,12 +118,13 @@ export default function PhonesPage() {
 
   const handleAddProduct = async (data: ProductFormData) => {
     try {
+      setFormError(null);
       await createProduct.mutateAsync({
         ...data,
-        price: Number(data.price), // Ensure price is a number
+        price: Number(data.price),
       });
     } catch (error) {
-      // Error is handled by the mutation's onError callback
+      setFormError((error as TRPCClientErrorLike<AppRouter>)?.message || "Failed to create product");
       console.error("Failed to create product:", error);
     }
   };
@@ -125,16 +137,17 @@ export default function PhonesPage() {
     if (!editingProduct) return;
     
     try {
+      setFormError(null);
       await updateProduct.mutateAsync({
         id: editingProduct.id,
         data: {
           ...data,
-          price: Number(data.price), // Ensure price is a number
+          price: Number(data.price),
         },
       });
       setEditingProduct(null);
     } catch (error) {
-      // Error is handled by the mutation's onError callback
+      setFormError((error as TRPCClientErrorLike<AppRouter>)?.message || "Failed to update product");
       console.error("Failed to update product:", error);
     }
   };
@@ -193,7 +206,11 @@ export default function PhonesPage() {
       cell: ({ row }) => {
         const stock = row.getValue("stockQuantity") as number;
         return (
-          <div className={`font-medium ${stock > 0 ? "text-green-600" : "text-red-600"}`}>
+          <div className={
+              `font-medium ${stock > 0 ?
+              "text-green-600" :
+              "text-red-600"}`
+            }>
             {stock}
           </div>
         );
@@ -212,10 +229,10 @@ export default function PhonesPage() {
           <img
             src={imageUrl}
             alt={row.getValue("name") as string}
-            className="h-10 w-10 rounded-md object-cover"
+            className="object-cover w-10 h-10 rounded-md"
           />
         ) : (
-          <div className="h-10 w-10 rounded-md bg-gray-100 flex items-center justify-center text-gray-400">
+          <div className="flex items-center justify-center w-10 h-10 text-gray-400 bg-gray-100 rounded-md">
             No image
           </div>
         );
@@ -237,7 +254,7 @@ export default function PhonesPage() {
                     onClick={() => handleEditProduct(product)}
                     className="hover:bg-blue-100 hover:text-blue-600"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="w-4 h-4" />
                     <span className="sr-only">Edit {product.name}</span>
                   </Button>
                 </TooltipTrigger>
@@ -256,7 +273,7 @@ export default function PhonesPage() {
                     onClick={() => handleDeleteProduct(product.id)}
                     className="hover:bg-red-100 hover:text-red-600"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="w-4 h-4" />
                     <span className="sr-only">Delete {product.name}</span>
                   </Button>
                 </TooltipTrigger>
@@ -271,37 +288,64 @@ export default function PhonesPage() {
     },
   ];
 
-  if (isLoading) {
+  if (productsQuery.isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading products...</div>
+      <div className="flex justify-center items-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (error || productsQuery.error) {
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <ErrorMessage
+          message={error || (productsQuery.error as TRPCClientErrorLike<AppRouter>)?.message || "An error occurred"}
+          severity="error"
+          onDismiss={() => setError(null)}
+        />
+      </div>
+    );
+  }
+
+  const products = productsQuery.data?.products ?? [];
+  if (products.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <ErrorMessage
+          message="No products found. Add your first product to get started."
+          severity="info"
+        />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-4 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Phones Management</h1>
+    <div className="container mx-auto py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Manage Phones</h1>
         <AddPhoneForm 
           onSubmit={handleAddProduct} 
           isSubmitting={createProduct.isPending}
+          error={formError}
         />
       </div>
 
       <DataTable
         columns={columns}
-        data={data?.products ?? []}
-        searchKey="name"
-        searchPlaceholder="Search by name..."
+        data={products}
       />
 
       {editingProduct && (
         <EditPhoneForm
           product={editingProduct}
           onSubmit={handleUpdateProduct}
-          onCancel={() => setEditingProduct(null)}
+          onCancel={() => {
+            setEditingProduct(null);
+            setFormError(null);
+          }}
           isSubmitting={updateProduct.isPending}
+          error={formError}
         />
       )}
 

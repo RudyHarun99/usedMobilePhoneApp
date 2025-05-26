@@ -15,7 +15,7 @@ import './app.css';
 import { Toaster } from "~/components/ui/toaster";
 import { TooltipProvider } from "~/components/ui/tooltip";
 
-export const links: Route['LinksFunction'] = () => [
+export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',
@@ -28,7 +28,7 @@ export const links: Route['LinksFunction'] = () => [
   },
 ];
 
-export function meta(_args: Route["MetaArgs"]) {
+export function meta(_args: Route.MetaArgs) {
   return [
     { title: "Admin Dashboard" },
     { name: "description", content: "Admin dashboard for managing products" },
@@ -84,7 +84,7 @@ export default function App() {
   );
 }
 
-export function ErrorBoundary({ error }: Route['ErrorBoundaryProps']) {
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = 'Oops!';
   let details = 'An unexpected error occurred.';
   let stack: string | undefined;

@@ -3,6 +3,8 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { ErrorMessage } from "~/components/ErrorMessage";
 import {
   Dialog,
   DialogContent,
@@ -28,9 +30,16 @@ interface EditPhoneFormProps {
   onSubmit: (data: ProductFormData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
+  error?: string | null;
 }
 
-export function EditPhoneForm({ product, onSubmit, onCancel, isSubmitting = false }: EditPhoneFormProps) {
+export function EditPhoneForm({ 
+  product, 
+  onSubmit, 
+  onCancel, 
+  isSubmitting = false,
+  error = null 
+}: EditPhoneFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     sku: product.sku,
     slug: product.slug,
@@ -83,6 +92,15 @@ export function EditPhoneForm({ product, onSubmit, onCancel, isSubmitting = fals
             Make changes to the phone details here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
+        {error && (
+          <div className="mb-4">
+            <ErrorMessage
+              message={error}
+              severity="error"
+              onDismiss={onCancel}
+            />
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
@@ -176,7 +194,14 @@ export function EditPhoneForm({ product, onSubmit, onCancel, isSubmitting = fals
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
+              {isSubmitting ? (
+                <>
+                  <LoadingSpinner size="sm" className="mr-2" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </Button>
           </DialogFooter>
         </form>

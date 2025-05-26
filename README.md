@@ -75,17 +75,17 @@
 - [x] Provide a public GitHub repository with:
    - [x] Clear instructions on the README how to set up and run the project locally.
    - [x] The database schema and any necessary seed scripts.
-   - [ ] Comments in the code to explain key parts of the implementation.
+   - [x] Comments in the code to explain key parts of the implementation.
    - [ ] (Optional) A short write-up in the README explaining decisions made during the development process, including challenges you encountered and how they were resolved.
 - [x] Display a list of all realistic products, the used mobile phones, on a homepage with a CSS grid showing name, price, thumbnail image, and more.
 - [x] Allow users to select a product to view its details on a separate page with name, description, price, larger image, and more.
 - [x] Ensure code quality through consistent linting/formatting, modular folder structure, and comments for complex logic.
 - [x] (Optional) Search products by keyword.
 - [x] (Optional) Have sorting, filtering, and pagination with various criteria.
+- [x] (Optional) Admin dashboard to manage the products, monitoring the transactions, etc.
 - [ ] Deploy the application with a live URL and a public GitHub repository including documentation.
 - [ ] (Optional) Product category.
 - [ ] (Optional) Product variant.
 - [ ] (Optional) Implement basic authentication & authorization.
 - [ ] (Optional) Add to cart and check out flow of buying the product.
-- [ ] (Optional) Admin dashboard to manage the products, monitoring the transactions, etc.
 - [ ] (Optional) Payment gateway integration. Sandbox is okay.

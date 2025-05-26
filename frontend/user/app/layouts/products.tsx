@@ -10,6 +10,7 @@ import ErrorFetch from "~/components/errorFetch";
 import type { OptionProps } from "~/types";
 import type { SortBy } from '~/types';
 import type { SortOrder } from '~/types';
+import type { ProductType } from '~/types';
 
 const style = {
   mainWrap: "overflow-hidden relative max-w-[1500px] min-w-[1200px] mx-5 pt-5",
@@ -59,7 +60,7 @@ export default function Products() {
           </div>
           <div className={style.productList}>
             {
-              data?.products.map(product => {
+              data?.products.map((product: ProductType) => {
                 return (
                   <CardProduct
                     key={product.id}

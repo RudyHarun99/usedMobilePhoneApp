@@ -1,9 +1,8 @@
 import { type RouteConfig, route } from "@react-router/dev/routes";
 
 export default [
-  route("/", "routes/dashboard.tsx", [
-    route("/", "./layouts/products.tsx"),
-    route("/products/new", "./layouts/productForm.tsx"),
-    route("/products/:productId/edit", "./layouts/productForm.tsx"),
+  route("/", "routes/welcome.tsx"),
+  route("/dashboard", "./components/dashboard/layout.tsx", [
+    route("phones", "./routes/dashboard/phones.tsx"),
   ]),
 ] satisfies RouteConfig;
