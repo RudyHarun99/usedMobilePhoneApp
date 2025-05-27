@@ -1,10 +1,9 @@
-import { useState, type ChangeEvent } from "react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { ErrorMessage } from "~/components/ErrorMessage";
+import { LoadingSpinner } from "~/components/ui/loading-spinner";
+import { ErrorMessage } from "~/components/ui/error-message";
 import {
   Dialog,
   DialogContent,
@@ -13,74 +12,56 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import type { ProductFormData } from "./add-phone-form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import type { AddPhoneFormData } from "./add-phone-form";
+import { addPhoneSchema } from "./add-phone-form";
 
 interface EditPhoneFormProps {
   product: {
     id: string;
-    sku: string;
-    slug: string;
     name: string;
     description: string;
     price: string;
-    imageUrl?: string | null;
     stockQuantity: number;
     minimumOrderQuantity: number;
+    imageUrl?: string | null;
   };
-  onSubmit: (data: ProductFormData) => void;
+  onSubmit: (data: AddPhoneFormData) => void;
   onCancel: () => void;
   isSubmitting?: boolean;
   error?: string | null;
 }
 
-export function EditPhoneForm({ 
-  product, 
-  onSubmit, 
-  onCancel, 
+export function EditPhoneForm({
+  product,
+  onSubmit,
+  onCancel,
   isSubmitting = false,
-  error = null 
+  error = null,
 }: EditPhoneFormProps) {
-  const [formData, setFormData] = useState<ProductFormData>({
-    sku: product.sku,
-    slug: product.slug,
-    name: product.name,
-    description: product.description,
-    price: Number(product.price),
-    imageUrl: product.imageUrl ?? "",
-    stockQuantity: product.stockQuantity,
-    minimumOrderQuantity: product.minimumOrderQuantity,
+  const form = useForm<AddPhoneFormData>({
+    resolver: zodResolver(addPhoneSchema),
+    defaultValues: {
+      name: product.name,
+      description: product.description,
+      price: Number(product.price),
+      stockQuantity: product.stockQuantity,
+      minimumOrderQuantity: product.minimumOrderQuantity,
+      imageUrl: product.imageUrl || "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: id === "price" || id === "stockQuantity" || id === "minimumOrderQuantity" 
-        ? Number(value) 
-        : value,
-    }));
-  };
-
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
-  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    const slug = generateSlug(name);
-    setFormData(prev => ({
-      ...prev,
-      name,
-      slug,
-    }));
+  const handleSubmit = (data: AddPhoneFormData) => {
+    onSubmit(data);
   };
 
   return (
@@ -89,7 +70,7 @@ export function EditPhoneForm({
         <DialogHeader>
           <DialogTitle>Edit Phone</DialogTitle>
           <DialogDescription>
-            Make changes to the phone details here. Click save when you're done.
+            Update the details of the phone in the inventory.
           </DialogDescription>
         </DialogHeader>
         {error && (
@@ -97,114 +78,145 @@ export function EditPhoneForm({
             <ErrorMessage
               message={error}
               severity="error"
-              onDismiss={onCancel}
+              onDismiss={() => {}}
             />
           </div>
         )}
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={handleNameChange}
-                className="col-span-3"
-                required
-                placeholder="e.g., iPhone 14 Pro Max"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter phone name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Enter price"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="stockQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock Quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter stock quantity"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="minimumOrderQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minimum Order Quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter minimum order quantity"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter image URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter phone description"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                placeholder="Enter phone description..."
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="price" className="text-right">
-                Price
-              </Label>
-              <Input
-                id="price"
-                type="number"
-                value={formData.price}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="imageUrl" className="text-right">
-                Image URL
-              </Label>
-              <Input
-                id="imageUrl"
-                type="url"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                className="col-span-3"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="stockQuantity" className="text-right">
-                Stock
-              </Label>
-              <Input
-                id="stockQuantity"
-                type="number"
-                value={formData.stockQuantity}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="0"
-                placeholder="0"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="minimumOrderQuantity" className="text-right">
-                Min Order
-              </Label>
-              <Input
-                id="minimumOrderQuantity"
-                type="number"
-                value={formData.minimumOrderQuantity}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="1"
-                placeholder="1"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <LoadingSpinner size="sm" className="mr-2" />
-                  Saving...
-                </>
-              ) : (
-                "Save Changes"
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
+                {isSubmitting ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

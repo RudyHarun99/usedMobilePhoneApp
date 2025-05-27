@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { DataTable } from "~/components/ui/data-table";
 import { Button } from "~/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
-import { AddPhoneForm, type ProductFormData } from "~/components/phones/add-phone-form";
+import { Pencil, Trash2, Database } from "lucide-react";
+import { AddPhoneForm } from "~/components/phones/add-phone-form";
+import type { AddPhoneFormData } from "~/components/phones/add-phone-form";
 import { EditPhoneForm } from "~/components/phones/edit-phone-form";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { ErrorMessage } from "~/components/ErrorMessage";
+import { LoadingState } from "~/components/ui/loading-state";
+import { ErrorState } from "~/components/ui/error-state";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import { trpc } from "~/lib/trpc";
 import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@backend/trpc/routers";
 import React from "react";
+import { generateSlug } from "~/lib/utils";
 
 export function meta(_args: Route["MetaArgs"]) {
   return [
@@ -116,12 +118,17 @@ export default function PhonesPage() {
     },
   });
 
-  const handleAddProduct = async (data: ProductFormData) => {
+  const handleAddProduct = async (data: AddPhoneFormData) => {
     try {
       setFormError(null);
+      const name = data.name;
+      const slug = generateSlug(name);
+      const sku = `${slug}-${Date.now()}`;
       await createProduct.mutateAsync({
         ...data,
         price: Number(data.price),
+        sku,
+        slug,
       });
     } catch (error) {
       setFormError((error as TRPCClientErrorLike<AppRouter>)?.message || "Failed to create product");
@@ -133,16 +140,21 @@ export default function PhonesPage() {
     setEditingProduct(product);
   };
 
-  const handleUpdateProduct = async (data: ProductFormData) => {
+  const handleUpdateProduct = async (data: AddPhoneFormData) => {
     if (!editingProduct) return;
     
     try {
       setFormError(null);
+      const name = data.name;
+      const slug = generateSlug(name);
+      const sku = `${slug}-${Date.now()}`;
       await updateProduct.mutateAsync({
         id: editingProduct.id,
         data: {
           ...data,
           price: Number(data.price),
+          sku,
+          slug,
         },
       });
       setEditingProduct(null);
@@ -176,6 +188,14 @@ export default function PhonesPage() {
     {
       accessorKey: "name",
       header: "Name",
+      cell: ({ row }) => {
+        const name = row.getValue("name") as string;
+        return (
+          <div className="font-medium">
+            {name}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "description",
@@ -183,7 +203,7 @@ export default function PhonesPage() {
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
         return (
-          <div className="max-w-[200px] truncate" title={description}>
+          <div className="max-w-[200px] truncate hidden md:block" title={description}>
             {description}
           </div>
         );
@@ -194,10 +214,14 @@ export default function PhonesPage() {
       header: "Price",
       cell: ({ row }) => {
         const price = row.getValue("price") as string;
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(Number(price));
+        return (
+          <div className="font-medium">
+            {new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: "USD",
+            }).format(Number(price))}
+          </div>
+        );
       },
     },
     {
@@ -206,11 +230,7 @@ export default function PhonesPage() {
       cell: ({ row }) => {
         const stock = row.getValue("stockQuantity") as number;
         return (
-          <div className={
-              `font-medium ${stock > 0 ?
-              "text-green-600" :
-              "text-red-600"}`
-            }>
+          <div className={`font-medium ${stock > 0 ? "text-green-600" : "text-red-600"}`}>
             {stock}
           </div>
         );
@@ -219,21 +239,33 @@ export default function PhonesPage() {
     {
       accessorKey: "minimumOrderQuantity",
       header: "Min Order",
+      cell: ({ row }) => {
+        const minOrder = row.getValue("minimumOrderQuantity") as number;
+        return (
+          <div className="hidden sm:block">
+            {minOrder}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "imageUrl",
       header: "Image",
       cell: ({ row }) => {
         const imageUrl = row.getValue("imageUrl") as string | null;
-        return imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={row.getValue("name") as string}
-            className="object-cover w-10 h-10 rounded-md"
-          />
-        ) : (
-          <div className="flex items-center justify-center w-10 h-10 text-gray-400 bg-gray-100 rounded-md">
-            No image
+        return (
+          <div className="hidden md:block">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt={row.getValue("name") as string}
+                className="object-cover w-10 h-10 rounded-md"
+              />
+            ) : (
+              <div className="flex items-center justify-center w-10 h-10 text-gray-400 bg-gray-100 rounded-md">
+                No image
+              </div>
+            )}
           </div>
         );
       },
@@ -290,51 +322,61 @@ export default function PhonesPage() {
 
   if (productsQuery.isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <LoadingSpinner size="lg" />
-      </div>
+      <LoadingState
+        message="Loading phones..."
+        size="lg"
+        className="p-12"
+      />
     );
   }
 
   if (error || productsQuery.error) {
     return (
-      <div className="max-w-2xl mx-auto p-4">
-        <ErrorMessage
-          message={error || (productsQuery.error as TRPCClientErrorLike<AppRouter>)?.message || "An error occurred"}
-          severity="error"
-          onDismiss={() => setError(null)}
-        />
-      </div>
+      <ErrorState
+        title="Failed to Load Phones"
+        message={error || (productsQuery.error as TRPCClientErrorLike<AppRouter>)?.message || "An error occurred while loading phones"}
+        severity="error"
+        onRetry={() => {
+          setError(null);
+          utils.products.list.invalidate();
+        }}
+        onDismiss={() => setError(null)}
+        className="p-12"
+      />
     );
   }
 
   const products = productsQuery.data?.products ?? [];
   if (products.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto p-4">
-        <ErrorMessage
-          message="No products found. Add your first product to get started."
-          severity="info"
-        />
-      </div>
+      <ErrorState
+        title="No Phones Found"
+        message="Add your first phone to get started. Click the 'Add Phone' button above to create a new phone listing."
+        severity="info"
+        className="p-12"
+      />
     );
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-12 space-y-8">
+      <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-bold">Manage Phones</h1>
-        <AddPhoneForm 
-          onSubmit={handleAddProduct} 
-          isSubmitting={createProduct.isPending}
-          error={formError}
-        />
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <AddPhoneForm 
+            onSubmit={handleAddProduct} 
+            isSubmitting={createProduct.isPending}
+            error={formError}
+          />
+        </div>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={products}
-      />
+      <div className="max-w-[1400px] mx-auto">
+        <DataTable
+          columns={columns}
+          data={products}
+        />
+      </div>
 
       {editingProduct && (
         <EditPhoneForm
@@ -350,18 +392,19 @@ export default function PhonesPage() {
       )}
 
       <Dialog open={deletingProductId !== null} onOpenChange={() => setDeletingProductId(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Delete Phone</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete this phone? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
             <Button 
               variant="outline" 
               onClick={cancelDelete}
               disabled={deleteProduct.isPending}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -369,6 +412,7 @@ export default function PhonesPage() {
               variant="destructive" 
               onClick={confirmDelete}
               disabled={deleteProduct.isPending}
+              className="w-full sm:w-auto"
             >
               {deleteProduct.isPending ? "Deleting..." : "Delete"}
             </Button>

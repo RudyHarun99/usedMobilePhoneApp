@@ -4,8 +4,8 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { ErrorMessage } from "~/components/ErrorMessage";
+import { LoadingSpinner } from "~/components/ui/loading-spinner";
+import { ErrorMessage } from "~/components/ui/error-message";
 import {
   Dialog,
   DialogContent,
@@ -15,80 +15,65 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
+import { generateSlug } from "~/lib/utils";
+
+export const addPhoneSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.number().min(0, "Price must be greater than or equal to 0"),
+  stockQuantity: z.number().min(0, "Stock quantity must be greater than or equal to 0"),
+  minimumOrderQuantity: z.number().min(1, "Minimum order quantity must be at least 1"),
+  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+  sku: z.string().optional(),
+  slug: z.string().optional(),
+});
+
+export type AddPhoneFormData = z.infer<typeof addPhoneSchema>;
 
 interface AddPhoneFormProps {
-  onSubmit: (data: ProductFormData) => void;
+  onSubmit: (data: AddPhoneFormData) => void;
   isSubmitting?: boolean;
   error?: string | null;
 }
 
-export interface ProductFormData {
-  sku: string;
-  slug: string;
-  name: string;
-  description: string;
-  price: number;
-  imageUrl?: string;
-  stockQuantity: number;
-  minimumOrderQuantity: number;
-}
-
 export function AddPhoneForm({ onSubmit, isSubmitting = false, error = null }: AddPhoneFormProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<ProductFormData>({
-    sku: "",
-    slug: "",
-    name: "",
-    description: "",
-    price: 0,
-    imageUrl: "",
-    stockQuantity: 1,
-    minimumOrderQuantity: 1,
-  });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit(formData);
-    setOpen(false);
-    setFormData({
-      sku: "",
-      slug: "",
+  const form = useForm<AddPhoneFormData>({
+    resolver: zodResolver(addPhoneSchema),
+    defaultValues: {
       name: "",
       description: "",
       price: 0,
-      imageUrl: "",
       stockQuantity: 1,
       minimumOrderQuantity: 1,
-    });
-  };
+      imageUrl: "",
+    },
+  });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [id]: id === "price" || id === "stockQuantity" || id === "minimumOrderQuantity" 
-        ? Number(value) 
-        : value,
-    }));
-  };
-
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
+  const handleSubmit = (data: AddPhoneFormData) => {
+    onSubmit(data);
+    form.reset();
+    setOpen(false);
   };
 
   const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     const slug = generateSlug(name);
     const sku = `${slug}-${Date.now()}`;
-    setFormData(prev => ({
-      ...prev,
-      name,
-      slug,
-      sku,
-    }));
+    form.setValue("name", name);
+    form.setValue("slug", slug);
+    form.setValue("sku", sku);
   };
 
   return (
@@ -115,96 +100,126 @@ export function AddPhoneForm({ onSubmit, isSubmitting = false, error = null }: A
             />
           </div>
         )}
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={handleNameChange}
-                className="col-span-3"
-                required
-                placeholder="e.g., iPhone 14 Pro Max"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input 
+                        placeholder="Enter phone name" 
+                        {...field} 
+                        onChange={(e) => {
+                          field.onChange(e);
+                          handleNameChange(e);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Enter price"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="stockQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock Quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter stock quantity"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="minimumOrderQuantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minimum Order Quantity</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Enter minimum order quantity"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter image URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter phone description"
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Description
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                placeholder="Enter phone description..."
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="price" className="text-right">
-                Price
-              </Label>
-              <Input
-                id="price"
-                type="number"
-                value={formData.price}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="imageUrl" className="text-right">
-                Image URL
-              </Label>
-              <Input
-                id="imageUrl"
-                type="url"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                className="col-span-3"
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="stockQuantity" className="text-right">
-                Stock
-              </Label>
-              <Input
-                id="stockQuantity"
-                type="number"
-                value={formData.stockQuantity}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="0"
-                placeholder="0"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="minimumOrderQuantity" className="text-right">
-                Min Order
-              </Label>
-              <Input
-                id="minimumOrderQuantity"
-                type="number"
-                value={formData.minimumOrderQuantity}
-                onChange={handleChange}
-                className="col-span-3"
-                required
-                min="1"
-                placeholder="1"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" disabled={isSubmitting}>
+
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+            >
               {isSubmitting ? (
                 <>
                   <LoadingSpinner size="sm" className="mr-2" />
@@ -214,8 +229,8 @@ export function AddPhoneForm({ onSubmit, isSubmitting = false, error = null }: A
                 "Add Phone"
               )}
             </Button>
-          </DialogFooter>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
