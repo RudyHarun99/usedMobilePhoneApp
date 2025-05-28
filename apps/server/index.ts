@@ -14,7 +14,8 @@ app.use('*', corsMiddleware)
 
 // Health check endpoint to verify server status
 app.get('/', (c) => c.text('Hono app is alive'));
-app.get('/health', (c) => c.json({ status: 'ok' }))
+app.get('/ping', (c) => c.json({ pong: true }));
+app.get('/health', (c) => c.json({ status: 'ok' }));
 
 // Route for handling tRPC API requests
 app.use('/api/trpc/*', trpcHandler)
