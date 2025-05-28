@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Product {
@@ -24,4 +25,9 @@ model Product {
   updatedAt             DateTime  @updatedAt
 
   @@map("products")
+  // Enable RLS if you want to use Supabase's Row Level Security
+  // @@allow("select", true)
+  // @@allow("insert", auth.role() == "authenticated")
+  // @@allow("update", auth.role() == "authenticated")
+  // @@allow("delete", auth.role() == "authenticated")
 } 

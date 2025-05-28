@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "docker compose up -d && bun run --watch index.ts",
+    "dev": "bun run --watch index.ts",
     "start": "docker compose up -d && bun run index.ts",
     "format": "biome format --write .",
     "lint": "biome lint .",
@@ -21,12 +21,19 @@
     "db:down": "docker compose down",
     "db:restart": "docker compose restart",
     "db:logs": "docker compose logs -f",
-    "db:status": "docker compose ps"
+    "db:status": "docker compose ps",
+    "db:supabase:generate": "NODE_ENV=production prisma generate",
+    "db:supabase:push": "NODE_ENV=production prisma db push --skip-generate",
+    "db:supabase:seed": "NODE_ENV=production bun run prisma/seed.ts",
+    "db:supabase:studio": "NODE_ENV=production prisma studio",
+    "db:supabase:reset": "NODE_ENV=production prisma db push --force-reset && NODE_ENV=production bun run prisma/seed.ts",
+    "db:supabase:setup": "turbo run db:supabase:generate db:supabase:push db:supabase:seed"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest",
     "bun-types": "^1.2.13",
+    "dotenv-cli": "^8.0.0",
     "prisma": "^6.8.2"
   },
   "peerDependencies": {
@@ -38,6 +45,7 @@
     "@trpc/client": "^11.1.2",
     "@trpc/server": "^11.1.2",
     "better-auth": "^1.2.8",
+    "dotenv": "^16.5.0",
     "hono": "^4.7.10",
     "ulid": "^3.0.0",
     "zod": "^3.24.4"

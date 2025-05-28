@@ -11,7 +11,8 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "dependsOn": ["db:generate"]
     },
     "clean": {
       "cache": false
@@ -33,9 +34,17 @@
       "cache": false,
       "dependsOn": ["db:generate"]
     },
+    "db:deploy": {
+      "cache": false,
+      "dependsOn": ["db:push", "db:seed"]
+    },
     "db:seed": {
       "cache": false,
       "dependsOn": ["db:push"]
+    },
+    "db:setup": {
+      "cache": false,
+      "dependsOn": ["db:generate", "db:push", "db:seed"]
     },
     "db:studio": {
       "cache": false,
@@ -57,6 +66,30 @@
     },
     "db:status": {
       "cache": false
+    },
+    "db:supabase:generate": {
+      "cache": false,
+      "outputs": ["node_modules/.prisma/**"]
+    },
+    "db:supabase:push": {
+      "cache": false,
+      "dependsOn": ["db:supabase:generate"]
+    },
+    "db:supabase:seed": {
+      "cache": false,
+      "dependsOn": ["db:supabase:push"]
+    },
+    "db:supabase:studio": {
+      "cache": false,
+      "persistent": true
+    },
+    "db:supabase:reset": {
+      "cache": false,
+      "dependsOn": ["db:supabase:push", "db:supabase:seed"]
+    },
+    "db:supabase:setup": {
+      "cache": false,
+      "dependsOn": ["db:supabase:generate", "db:supabase:push", "db:supabase:seed"]
     }
   }
 }
