@@ -1,18 +1,8 @@
-import { config } from 'dotenv';
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { corsMiddleware } from './src/middlewares/cors'
 import { errorHandler } from './src/middlewares/errorHandler'
 import { trpcHandler } from './src/handlers/trpc'
-
-console.log(Bun.env.NODE_ENV, '<<< env');
-console.log(Bun.env.DATABASE_URL, '<<< database url');
-console.log(Bun.env.DIRECT_URL, '<<< direct url');
-
-config({
-  path: Bun.env.NODE_ENV === 'production' ?
-  '.env.production' : '.env.local'
-});
 
 // Initialize a new Hono app instance
 const app = new Hono()
