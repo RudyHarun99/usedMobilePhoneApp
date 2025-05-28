@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run --watch index.ts && prisma generate",
-    "build": "NODE_ENV=production prisma generate && bun build ./index.ts --outdir ./dist --target node",
+    "build": "NODE_ENV=production prisma generate && bun build ./index.ts --outdir ./dist --target node && mkdir -p ./dist/public && cp -r ./public/* ./dist/public/ 2>/dev/null || true",
     "start": "docker compose up -d && bun run index.ts",
     "start:prod": "NODE_ENV=production bun run ./dist/index.js",
     "format": "biome format --write .",
