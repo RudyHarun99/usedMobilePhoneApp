@@ -25,7 +25,7 @@ WORKDIR /app
 RUN bun add serve
 
 # Copy built files from builder
-COPY --from=builder /app/apps/web-user/build ./build
+COPY --from=builder /app/apps/web-user/dist ./build
 
 EXPOSE 3000
 
