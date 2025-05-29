@@ -1,31 +1,34 @@
-# ---- 1. Build stage ----
+# --- 1. Build Stage ---
 FROM oven/bun:1.1.13 AS builder
 
 WORKDIR /app
 
-# Install dependencies
+# Copy dependencies first for better caching
 COPY bun.lockb package.json ./
 RUN bun install
 
-# Copy source files
+# Copy the entire monorepo
 COPY . .
 
-# Build the app
+# Move into the actual frontend app directory
+WORKDIR /app/apps/web-user
+
+# Run the Vite build
 RUN bun run build
 
-# ---- 2. Serve stage ----
+
+# --- 2. Serve Stage ---
 FROM oven/bun:1.1.13 AS runner
 
 WORKDIR /app
 
-# Install a static file server
+# Install a lightweight static file server
 RUN bun add serve
 
-# Copy built files from builder
-COPY --from=builder /app/dist ./dist
+# Copy the built frontend from builder stage
+COPY --from=builder /app/apps/web-user/dist ./dist
 
-# Expose port for Railway
 EXPOSE 3000
 
-# Serve the app
 CMD ["bunx", "serve", "dist", "--single", "--port", "3000"]
+    
