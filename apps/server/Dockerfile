@@ -13,9 +13,6 @@ RUN bun install
 # Generate Prisma client
 RUN bunx prisma generate
 
-# Push schema to production DB (optional, safe if idempotent)
-RUN bunx prisma db push
-
 # Expose port (optional for Docker, but good practice)
 EXPOSE 3000
 
