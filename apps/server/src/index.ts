@@ -1,8 +1,8 @@
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
-import { corsMiddleware } from './src/middlewares/cors'
-import { errorHandler } from './src/middlewares/errorHandler'
-import { trpcHandler } from './src/handlers/trpc'
+import { corsMiddleware } from './middlewares/cors'
+import { errorHandler } from './middlewares/errorHandler'
+import { trpcHandler } from './handlers/trpc'
 
 // Initialize a new Hono app instance
 const app = new Hono()

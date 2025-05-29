@@ -1,21 +1,5 @@
 {
   "name": "used-mobile-phone-app",
-  "private": true,
-  "packageManager": "npm@8.5.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "clean": "turbo run clean",
-    "check-types": "turbo run check-types",
-    "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "prepare": "husky install"
-  },
   "devDependencies": {
     "turbo": "^2.5.3",
     "prettier": "^3.0.0",
@@ -30,5 +14,21 @@
     "**/*.{json,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "packageManager": "npm@8.5.0",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
