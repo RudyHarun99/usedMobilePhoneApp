@@ -2,6 +2,7 @@
   "name": "user",
   "private": true,
   "type": "module",
+  "packageManager": "bun@1.0.35",
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
