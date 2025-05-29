@@ -10,7 +10,7 @@ A monorepo application for managing used mobile phone listings, built with React
 │   ├── server/         # Backend API (Bun + Prisma)
 │   ├── web-admin/      # Admin Dashboard (React)
 │   └── web-user/       # User Frontend (React)
-└── packages/           # Shared packages (if any)
+└── package.json
 ```
 
 ## Prerequisites
@@ -24,7 +24,7 @@ A monorepo application for managing used mobile phone listings, built with React
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/RudyHarun99/usedMobilePhoneApp.git
 cd usedMobilePhoneApp
 ```
 
@@ -82,6 +82,9 @@ turbo run dev --filter=web-user
 
 ## Additional Information
 - Ensure environment variables are set correctly in the .env file.
+- Live user frontend (https://web-user.rudyharun.web.id/)
+- Live admin dashboard (https://web-admin.rudyharun.web.id/)
+- Live backend server (https://usedmobilephoneapp-server.up.railway.app/)
 
 ## Check List
 
@@ -96,8 +99,8 @@ turbo run dev --filter=web-user
 - [x] Database: PostgreSQL.
 - [x] Containerization: Docker and Docker Compose. At least for local database setup.
 - [x] Tools: Biome or ESLint with Prettier.
-- [ ] Deployment: Deploy on any platform such as Vercel, Netlify, Railway, Render, Neon, Supabase, Coolify, VPS, GCP, AWS, or anywhere is fine.
-- [ ] Domain: Connect to a subdomain/domain you own.
+- [x] Deployment: Deploy on any platform such as Vercel, Netlify, Railway, Render, Neon, Supabase, Coolify, VPS, GCP, AWS, or anywhere is fine.
+- [x] Domain: Connect to a subdomain/domain you own.
 - [ ] (Optional) Auth: Better Auth.
 - [ ] (Optional) Monorepo Tool: Turborepo.
 
@@ -113,7 +116,7 @@ turbo run dev --filter=web-user
 - [x] (Optional) Search products by keyword.
 - [x] (Optional) Have sorting, filtering, and pagination with various criteria.
 - [x] (Optional) Admin dashboard to manage the products, monitoring the transactions, etc.
-- [ ] Deploy the application with a live URL and a public GitHub repository including documentation.
+- [x] Deploy the application with a live URL and a public GitHub repository including documentation.
 - [ ] (Optional) Product category.
 - [ ] (Optional) Product variant.
 - [ ] (Optional) Implement basic authentication & authorization.
