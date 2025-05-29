@@ -1,22 +1,31 @@
-FROM node:20-alpine AS development-dependencies-env
-COPY . /app
-WORKDIR /app
-RUN npm ci
+# ---- 1. Build stage ----
+FROM oven/bun:1.1.13 AS builder
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
 WORKDIR /app
-RUN npm ci --omit=dev
 
-FROM node:20-alpine AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN npm run build
+# Install dependencies
+COPY bun.lockb package.json ./
+RUN bun install
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
+# Copy source files
+COPY . .
+
+# Build the app
+RUN bun run build
+
+# ---- 2. Serve stage ----
+FROM oven/bun:1.1.13 AS runner
+
 WORKDIR /app
-CMD ["npm", "run", "start"]
+
+# Install a static file server
+RUN bun add serve
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+
+# Expose port for Railway
+EXPOSE 3000
+
+# Serve the app
+CMD ["bunx", "serve", "dist", "--single", "--port", "3000"]
