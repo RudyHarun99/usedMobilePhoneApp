@@ -3,29 +3,28 @@ FROM oven/bun:1.1.13 AS builder
 
 WORKDIR /app
 
-# Copy dependencies first for better caching
+# Copy root dependencies for caching
 COPY bun.lockb package.json ./
 RUN bun install
 
-# Copy the entire monorepo
+# Copy entire monorepo
 COPY . .
 
-# Move into the actual frontend app directory
+# Set workdir to frontend app
 WORKDIR /app/apps/web-user
 
-# Run the Vite build
+# Run build
 RUN bun run build
-
 
 # --- 2. Serve Stage ---
 FROM oven/bun:1.1.13 AS runner
 
 WORKDIR /app
 
-# Install a lightweight static file server
+# Install lightweight static server
 RUN bun add serve
 
-# Copy the built frontend from builder stage
+# Copy built files from builder
 COPY --from=builder /app/apps/web-user/dist ./dist
 
 EXPOSE 3000
