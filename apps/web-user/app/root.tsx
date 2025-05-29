@@ -50,7 +50,7 @@ export default function App() {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: 'https://usedmobilephoneapp-production.up.railway.app/api/trpc',
+          url: 'https://usedmobilephoneapp-server.up.railway.app/api/trpc',
           // You can pass any HTTP headers you wish here
           async headers() {
             return {
